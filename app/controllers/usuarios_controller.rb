@@ -32,18 +32,20 @@ class UsuariosController < ApplicationController
   # POST /usuarios
   # POST /usuarios.json
   def create
-    @usuario = Usuario.new(usuario_params)
-    respond_to do |format|
-      if @usuario.save
-        format.json { render :show, status: 201, location: @usuario }
-      else
-        format.json { render json: @usuario.errors, status: :unprocessable_entity }
+    if request.raw_post.include? '"id"'
+       render json: { "error": "No se puede crear usuario con id"}, :status => 400
+    else
+      @usuario = Usuario.new(usuario_params)
+      respond_to do |format|
+        if @usuario.save
+          format.json { render :show, status: 201, location: @usuario }
+        else
+          format.json { render json: @usuario.errors, status: :unprocessable_entity }
+        end
       end
     end
   end
 
-  # PATCH/PUT /usuarios/1
-  # PATCH/PUT /usuarios/1.json
   def update
     respond_to do |format|
       if @usuario.update(usuario_params)
@@ -54,8 +56,6 @@ class UsuariosController < ApplicationController
     end
   end
 
-  # DELETE /usuarios/1
-  # DELETE /usuarios/1.json
   def destroy
     @usuario.destroy
     respond_to do |format|
